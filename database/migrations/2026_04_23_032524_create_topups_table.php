@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('topups', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('order_id')->unique();
+            $table->integer('amount');
+            $table->enum('status', ['pending', 'success', 'failed', 'expired'])->default('pending');
+            $table->string('snap_token')->nullable();
             $table->timestamps();
         });
     }
