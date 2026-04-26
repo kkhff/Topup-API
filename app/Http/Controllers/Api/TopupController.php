@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Midtrans\Config;
 use Midtrans\Snap;
 use App\Models\Topup;
+use App\Http\Resources\TopupResource;
 
 class TopupController extends Controller
 {
@@ -18,6 +19,16 @@ class TopupController extends Controller
         Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
         Config::$isSanitized = true;
         Config::$is3ds = true;
+    }
+
+    public function index()
+    {
+        $user = auth()->id();
+
+        $topup = Topup::where('user_id', $user)
+                 ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END");
+
+        return TopupResource::collection($topup->latest()->paginate(10));
     }
 
     public function store(Request $request)
@@ -48,13 +59,25 @@ class TopupController extends Controller
             'snap_token' => $snap_token,
         ]);
 
-        return response()->json([
+        return (new TopupResource($topup))->additional([
             'success' => true,
-            'message' => 'Menunggu pembayaran',
-            'status' => $topup->status,
-            'order_id' => $order_id,
-            'snap_token' => $snap_token,
+            'message' => 'menunggu pembayaran',
         ]);
+    }
+
+    public function show(String $id)
+    {
+        $topup = Topup::where('user_id', auth()->id())
+                      ->where('order_id', $id)
+                      ->first();
+
+        if (!$topup){
+            return response()->json([
+            'message' => 'Transaksi tidak ditemukan',
+            ],404);
+        }
+
+        return (new TopupResource($topup));
     }
 
     public function webhook(Request $request)
