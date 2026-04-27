@@ -1,58 +1,59 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TopUp API - Payment Gateway Integration
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sebuah RESTful API untuk sistem top-up saldo pengguna yang terintegrasi langsung dengan payment gateway Midtrans.
 
-## About Laravel
+**Catatan:** Repository ini murni berisi **Backend (REST API)**. Didesain secara *headless* agar siap dikonsumsi oleh berbagai platform Frontend (React, Vue, Mobile App, dll).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
+* **RESTful Endpoint:** Struktur URL yang rapi untuk manajemen Top-up.
+* **Midtrans Snap Integration:** Pembuatan transaksi (Order ID) dan pengembalian Snap Token secara otomatis.
+* **Secure Webhook Listener:** Menangkap notifikasi pembayaran dari server Midtrans (dilengkapi validasi Signature Key / SHA512).
+* **Auto-Update Balance:** Penambahan saldo user secara *real-time* saat pembayaran sukses (Settlement).
+* **Transaction History:** API untuk melihat riwayat transaksi pengguna beserta statusnya.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Teknologi yang Digunakan
+* **Framework:** Laravel (PHP 8+)
+* **Database:** MySQL
+* **Payment Gateway:** Midtrans (Sandbox)
+* **Testing & Tunneling:** Postman & Ngrok
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**[Klik di sini untuk melihat Dokumentasi Postman LaporHub API]**  
+https://crimson-satellite-1456435.postman.co/workspace/kkh's-Workspace~513eca4e-75f6-45a2-8afd-b1b7c048edb9/collection/51063118-116fbec1-6770-42af-8fdb-91627c84cff6?action=share&source=copy-link&creator=51063118
 
-## Learning Laravel
+## Cara Menjalankan Project (Lokal)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+**1. Clone Repository:**
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/kkhff/LaporHub-API.git
+cd LaporHub-API
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**2. Setup Environment**
+```bash
+cp .env.example .env
+```
 
-## Contributing
+**3. Install Dependencies:** Jika kamu memiliki PHP dan Composer lokal:
+```bash
+composer install
+```
+Jika kamu **hanya ingin menggunakan** Docker (Tanpa install PHP di lokal):
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**4. Jalankan Docker Sail**
+```bash
+./vendor/bin/sail up -d
+```
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**5. Generate Key & Migrate**
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan storage:link
+```
