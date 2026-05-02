@@ -55,5 +55,5 @@ docker run --rm \
 **5. Generate Key & Migrate**
 ```bash
 ./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan storage:link
+./vendor/bin/sail artisan migrate
 ```
